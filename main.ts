@@ -83,6 +83,26 @@ export default class AbstractFolderPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "reveal-active-file",
+			name: "Reveal active file in abstract tree",
+			callback: () => {
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile) {
+					new Notice("No active file to focus.");
+					return;
+				}
+
+				this.activateView().then(() => {
+					const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_ABSTRACT_FOLDER);
+					if (leaves.length > 0) {
+						const view = leaves[0].view as AbstractFolderView;
+						view.revealFile(activeFile);
+					}
+				}).catch(console.error);
+			}
+		});
+
+		this.addCommand({
 			id: "create-child",
 			name: "Create abstract child",
 			callback: () => {
@@ -95,19 +115,19 @@ export default class AbstractFolderPlugin extends Plugin {
 			},
 		});
 
-this.addCommand({
-	id: "manage-groups",
-	name: "Manage groups",
-	callback: () => {
-		new ManageGroupsModal(this.app, this.settings, (updatedGroups: Group[], activeGroupId: string | null) => {
-			this.settings.groups = updatedGroups;
-			this.settings.activeGroupId = activeGroupId;
-			this.saveSettings().then(() => {
-				this.app.workspace.trigger('abstract-folder:group-changed');
-			}).catch(console.error);
-		}).open();
-	},
-});
+		this.addCommand({
+			id: "manage-groups",
+			name: "Manage groups",
+			callback: () => {
+				new ManageGroupsModal(this.app, this.settings, (updatedGroups: Group[], activeGroupId: string | null) => {
+					this.settings.groups = updatedGroups;
+					this.settings.activeGroupId = activeGroupId;
+					this.saveSettings().then(() => {
+						this.app.workspace.trigger('abstract-folder:group-changed');
+					}).catch(console.error);
+				}).open();
+			},
+		});
 
 		this.addCommand({
 			id: "create-group-with-active-file",
@@ -136,63 +156,63 @@ this.addCommand({
 			}
 		});
 
-this.addCommand({
-	id: "clear-active-group",
-	name: "Clear active group",
-	callback: () => {
-		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_ABSTRACT_FOLDER);
-		if (leaves.length > 0) {
-			const view = leaves[0].view as AbstractFolderView;
-			view.clearActiveGroup();
-		} else if (this.settings.activeGroupId) {
-			this.settings.activeGroupId = null;
-			this.saveSettings().then(() => {
-				new Notice("Active group cleared.");
-				this.app.workspace.trigger('abstract-folder:group-changed');
-			}).catch(console.error);
-		} else {
-			new Notice("No active group to clear.");
-		}
-	},
-});
+		this.addCommand({
+			id: "clear-active-group",
+			name: "Clear active group",
+			callback: () => {
+				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_ABSTRACT_FOLDER);
+				if (leaves.length > 0) {
+					const view = leaves[0].view as AbstractFolderView;
+					view.clearActiveGroup();
+				} else if (this.settings.activeGroupId) {
+					this.settings.activeGroupId = null;
+					this.saveSettings().then(() => {
+						new Notice("Active group cleared.");
+						this.app.workspace.trigger('abstract-folder:group-changed');
+					}).catch(console.error);
+				} else {
+					new Notice("No active group to clear.");
+				}
+			},
+		});
 
-this.addCommand({
-	id: "convert-folder-to-plugin",
-	name: "Convert folder structure to plugin format",
-	callback: () => {
-		new FolderSelectionModal(this.app, (folder: TFolder) => {
-			new ConversionOptionsModal(this.app, folder, (options) => {
-				convertFoldersToPluginFormat(this.app, this.settings, folder, options)
-					.catch(console.error);
-			}).open();
-		}).open();
-	}
-});
-	this.addCommand({
-		id: "create-folders-from-plugin",
-		name: "Create folder structure from plugin format",
-		callback: () => {
-			new ScopeSelectionModal(this.app, (scope) => {
-				new DestinationPickerModal(this.app, (parentFolder: TFolder) => {
-					new NewFolderNameModal(this.app, parentFolder, (destinationPath: string, placeIndexFileInside: boolean) => {
-						// Automatically add the export folder to excluded paths if not already present
-						if (!this.settings.excludedPaths.includes(destinationPath)) {
-							this.settings.excludedPaths.push(destinationPath);
-							this.saveSettings().then(() => {
-								this.indexer.updateSettings(this.settings);
-							}).catch(console.error);
-						}
+		this.addCommand({
+			id: "convert-folder-to-plugin",
+			name: "Convert folder structure to plugin format",
+			callback: () => {
+				new FolderSelectionModal(this.app, (folder: TFolder) => {
+					new ConversionOptionsModal(this.app, folder, (options) => {
+						convertFoldersToPluginFormat(this.app, this.settings, folder, options)
+							.catch(console.error);
+					}).open();
+				}).open();
+			}
+		});
+		this.addCommand({
+			id: "create-folders-from-plugin",
+			name: "Create folder structure from plugin format",
+			callback: () => {
+				new ScopeSelectionModal(this.app, (scope) => {
+					new DestinationPickerModal(this.app, (parentFolder: TFolder) => {
+						new NewFolderNameModal(this.app, parentFolder, (destinationPath: string, placeIndexFileInside: boolean) => {
+							// Automatically add the export folder to excluded paths if not already present
+							if (!this.settings.excludedPaths.includes(destinationPath)) {
+								this.settings.excludedPaths.push(destinationPath);
+								this.saveSettings().then(() => {
+									this.indexer.updateSettings(this.settings);
+								}).catch(console.error);
+							}
 
-						const rootScope = (scope instanceof TFile) ? scope : undefined;
-						const plan = generateFolderStructurePlan(this.app, this.settings, this.indexer, destinationPath, placeIndexFileInside, rootScope);
-						new SimulationModal(this.app, plan.conflicts, (resolvedConflicts) => {
-							executeFolderGeneration(this.app, plan).catch((error) => console.error(error));
+							const rootScope = (scope instanceof TFile) ? scope : undefined;
+							const plan = generateFolderStructurePlan(this.app, this.settings, this.indexer, destinationPath, placeIndexFileInside, rootScope);
+							new SimulationModal(this.app, plan.conflicts, (resolvedConflicts) => {
+								executeFolderGeneration(this.app, plan).catch((error) => console.error(error));
+							}).open();
 						}).open();
 					}).open();
 				}).open();
-			}).open();
-		}
-	});
+			}
+		});
 		this.addSettingTab(new AbstractFolderSettingTab(this.app, this));
 
 		this.app.workspace.onLayoutReady(() => {
