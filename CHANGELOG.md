@@ -24,6 +24,9 @@
 
 **Fixes:**
 *   **Ellipsis Support**: Improved CSS handling for long names in search suggestions to ensure graceful overflow with ellipsis.
+*   **New Hotkey Options**: 
+      - Reveal active file in tree
+	  - Collapse all folders
 
 ## Version 1.13.3
 
