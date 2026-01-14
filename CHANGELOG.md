@@ -27,6 +27,7 @@
 *   **New Hotkey Options**: 
       - Reveal active file in tree
 	  - Collapse all folders
+	  - Expand all folders
 
 ## Version 1.13.3
 
