@@ -208,6 +208,20 @@ export class AbstractFolderSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Auto filter active file")
+			.setDesc(
+				"Automatically update the filter option when switching to a different file."
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.autoFilterActiveFile)
+					.onChange(async (value) => {
+						this.plugin.settings.autoFilterActiveFile = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Expand children when opening a file")
 			.setDesc(
 				"If enabled, when you open a file, its direct children folders will be expanded in the tree view.",

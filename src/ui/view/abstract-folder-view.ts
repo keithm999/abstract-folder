@@ -178,6 +178,10 @@ export class AbstractFolderView extends ItemView {
     this.registerEvent(this.app.workspace.on("file-open", (file) => {
         if (file) this.metricsManager.onInteraction(file.path);
         this.fileRevealManager?.onFileOpen(file);
+
+		if (this.settings.autoFilterActiveFile) {
+			this.focusActiveFile();
+		}
     }));
   }
 
