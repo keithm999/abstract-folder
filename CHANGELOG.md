@@ -25,6 +25,11 @@
 **Fixes:**
 *   **Ellipsis Support**: Improved CSS handling for long names in search suggestions to ensure graceful overflow with ellipsis.
 
+## Version 1.13.3-KM
+
+**Features:**
+*	**Auto Focus Active File**: Added setting (and command to toggle the setting) to enable auto filtering of active file. When switching file, the tree will automatically update to focus on the currently active file.
+
 ## Version 1.13.3
 
 **Fixes:**

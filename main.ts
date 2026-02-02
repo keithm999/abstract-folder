@@ -193,6 +193,19 @@ this.addCommand({
 			}).open();
 		}
 	});
+
+	
+	this.addCommand({
+		id: "toggle-auto-filter-active-file",
+		name: "Toggle auto filter active file",
+		callback: async () => {
+			this.settings.autoFilterActiveFile = !this.settings.autoFilterActiveFile;
+			await this.saveSettings();
+			this.app.workspace.trigger('abstract-folder:graph-updated');
+			new Notice(`Auto filter active file ${this.settings.autoFilterActiveFile ? 'enabled' : 'disabled'}.`);
+		}
+	});
+
 		this.addSettingTab(new AbstractFolderSettingTab(this.app, this));
 
 		this.app.workspace.onLayoutReady(() => {

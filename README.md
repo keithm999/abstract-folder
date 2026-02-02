@@ -1,5 +1,9 @@
 # Abstract Folder
 
+> [!NOTE]
+> This is my custom fork containing a few small tweaks and additions, including:
+> - Auto focus of active file
+
 **Organize your files virtually, independent of their physical location.**
 
 

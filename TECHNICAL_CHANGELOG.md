@@ -1,3 +1,10 @@
+# Technical Changelog - Abstract Folder Plugin v1.13.3-KM
+
+## Active File Focus
+*	**Strategy**: Have a way to automatically update the search box with the current file, every time the active file is changed. 
+*	**Benefit**: When reviewing files, knowing which folders the file is under is very useful and having the tree automatically update when the current file changes saves from having to manually filter each time. It also removes the risk that the user forgets to re-filter after selecting another file and is confused as the wrong file is visible in the tree.
+*	**Implementation**: New setting option to enable this. New command to toggle the functionality on and off without needing to open the settings.
+
 # Technical Changelog - Abstract Folder Plugin v1.13.1
 
 ## Context Menu Architecture Refinement

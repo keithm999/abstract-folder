@@ -8,6 +8,7 @@ export interface AbstractFolderPluginSettings {
   showAliases: boolean; // Whether to show aliases instead of file names in the view
   autoExpandParents: boolean; // Whether to expand parent folders when revealing the active file
   autoScrollToActiveFile: boolean; // Whether to scroll to the active file when opening it
+  autoFilterActiveFile: boolean; // Whether to automatically focus the active file
   autoExpandChildren: boolean; // Whether to expand all children folders when a file is opened
   startupOpen: boolean; // Whether to open the view on plugin load
   openSide: 'left' | 'right'; // Which side panel to open the view in
