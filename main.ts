@@ -193,6 +193,39 @@ this.addCommand({
 			}).open();
 		}
 	});
+
+	this.addCommand({
+		id: "reveal-active-file",
+		name: "Reveal active file in abstract folder view",
+		callback: () => {
+			const activeFile = this.app.workspace.getActiveFile();
+			if (!activeFile) {
+				new Notice("No active file to reveal.");
+				return;
+			}
+
+			this.activateView().then(() => {
+				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_ABSTRACT_FOLDER);
+				if (leaves.length > 0) {
+					const view = leaves[0].view as AbstractFolderView;
+					view.revealFile(activeFile);
+				}
+			}).catch(console.error);
+		}
+	});
+
+	
+	this.addCommand({
+		id: "toggle-auto-filter-active-file",
+		name: "Toggle auto filter active file",
+		callback: async () => {
+			this.settings.autoFilterActiveFile = !this.settings.autoFilterActiveFile;
+			await this.saveSettings();
+			this.app.workspace.trigger('abstract-folder:graph-updated');
+			new Notice(`Auto filter active file ${this.settings.autoFilterActiveFile ? 'enabled' : 'disabled'}.`);
+		}
+	});
+
 		this.addSettingTab(new AbstractFolderSettingTab(this.app, this));
 
 		this.app.workspace.onLayoutReady(() => {

@@ -13,7 +13,8 @@ export class ContextMenuHandler {
         private settings: AbstractFolderPluginSettings,
         private plugin: AbstractFolderPlugin,
         private indexer: FolderIndexer,
-        private focusFile: (path: string) => void
+        private focusFile: (path: string) => void,
+		private revealFile: (path: string) => void
     ) {}
 
     showContextMenu(event: MouseEvent, node: FolderNode, multiSelectedPaths: Set<string>) {
