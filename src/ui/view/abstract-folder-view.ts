@@ -874,6 +874,12 @@ export class AbstractFolderView extends ItemView {
     }
   }
 
+  public revealFile(file: TFile) {
+	if (file) {
+		this.fileRevealManager?.revealFile(file.path);
+	}
+  }
+
   public clearActiveGroup(showNotice: boolean = true) {
     if (this.settings.activeGroupId) {
         this.settings.activeGroupId = null;

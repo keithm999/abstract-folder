@@ -194,6 +194,26 @@ this.addCommand({
 		}
 	});
 
+	this.addCommand({
+		id: "reveal-active-file",
+		name: "Reveal active file in abstract folder view",
+		callback: () => {
+			const activeFile = this.app.workspace.getActiveFile();
+			if (!activeFile) {
+				new Notice("No active file to reveal.");
+				return;
+			}
+
+			this.activateView().then(() => {
+				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_ABSTRACT_FOLDER);
+				if (leaves.length > 0) {
+					const view = leaves[0].view as AbstractFolderView;
+					view.revealFile(activeFile);
+				}
+			}).catch(console.error);
+		}
+	});
+
 	
 	this.addCommand({
 		id: "toggle-auto-filter-active-file",
