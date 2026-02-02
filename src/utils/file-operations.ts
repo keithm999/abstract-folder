@@ -17,7 +17,7 @@ import { HIDDEN_FOLDER_ID } from "../types";
 export async function updateAbstractLinksOnRename(app: App, settings: AbstractFolderPluginSettings, indexer: FolderIndexer, file: TFile, oldPath: string) {
     const oldName = oldPath.split('/').pop() || oldPath;
     const oldBasename = oldName.endsWith('.md') ? oldName.slice(0, -3) : oldName;
-    
+
     const graph = indexer.getGraph();
     const parentsOfRenamed = graph.childToParents.get(oldPath);
     const childrenOfRenamed = graph.parentToChildren[oldPath];
@@ -47,7 +47,7 @@ export async function updateAbstractLinksOnRename(app: App, settings: AbstractFo
  */
 async function updateLinkInFrontmatter(app: App, settings: AbstractFolderPluginSettings, referencingFile: TFile, renamedFile: TFile, oldPath: string, oldBasename: string, oldName: string) {
     const oldPathNoExt = oldPath.endsWith('.md') ? oldPath.slice(0, -3) : oldPath;
-    
+
     await app.fileManager.processFrontMatter(referencingFile, (frontmatter: AbstractFolderFrontmatter) => {
         const props = [...settings.parentPropertyNames, ...settings.childrenPropertyNames];
 
@@ -72,11 +72,11 @@ async function updateLinkInFrontmatter(app: App, settings: AbstractFolderPluginS
                 } else {
                     isWiki = cleaned.startsWith('[[') && cleaned.endsWith(']]');
                     if (isWiki) cleaned = cleaned.slice(2, -2);
-                    
+
                     const parts = cleaned.split('|');
                     cleaned = parts[0].trim();
                 }
-                
+
                 const linkPart = cleaned;
                 const aliasPart = isMd ? mdLinkMatch![1] : (v.includes('|') ? v.split('|')[1].replace(']]', '').trim() : undefined);
 
@@ -84,7 +84,7 @@ async function updateLinkInFrontmatter(app: App, settings: AbstractFolderPluginS
                 // Also match against path without extension if it's a markdown file being renamed
                 if (linkPart === oldPath || linkPart === oldBasename || linkPart === oldName || linkPart === oldPathNoExt) {
                     const newLink = app.fileManager.generateMarkdownLink(renamedFile, referencingFile.path, undefined, aliasPart);
-                    
+
                     // Maintain the original format if it was a raw string (not a link)
                     if (!isWiki && !isMd) {
                          // If generateMarkdownLink returned a WikiLink, strip brackets to keep it raw
@@ -180,7 +180,7 @@ aliases:
             new Notice(`Unsupported child type: ${childType as string}`);
             return;
     }
-    
+
     const fileName = getConflictFreeName(app, settings, indexer, childName, fileExtension, parentFile);
 
     try {
@@ -237,7 +237,7 @@ export function getConflictFreeName(
     const separator = settings.namingConflictSeparator;
     const order = settings.namingConflictOrder;
     const safeBaseName = baseName.replace(/[\\/:*?"<>|]/g, "");
-    
+
     // Determine the base path based on whether it's a root note or has a physical parent
     let basePath = "";
     if (!parentFile && settings.defaultNewNotePath) {
@@ -250,7 +250,7 @@ export function getConflictFreeName(
     }
 
     let candidateName = `${basePath}${safeBaseName}${extension}`;
-    
+
     if (!app.vault.getAbstractFileByPath(candidateName)) {
         return candidateName;
     }
@@ -272,7 +272,7 @@ export function getConflictFreeName(
         const graph = indexer.getGraph();
         let current: string | undefined = parentFile.path;
         let root: string = parentFile.path;
-        
+
         const visited = new Set<string>();
         while (current && !visited.has(current)) {
             visited.add(current);
@@ -298,12 +298,12 @@ export function getConflictFreeName(
             }
         } else {
             if (order === 'parent-first') {
-                candidateName = `${basePath}[${contextName}] ${safeBaseName}${extension}`;
+                candidateName = `${basePath}(${contextName}) ${safeBaseName}${extension}`;
             } else {
-                candidateName = `${basePath}${safeBaseName} [${contextName}]${extension}`;
+                candidateName = `${basePath}${safeBaseName} (${contextName})${extension}`;
             }
         }
-        
+
         if (!app.vault.getAbstractFileByPath(candidateName)) {
             return candidateName;
         }
@@ -316,7 +316,7 @@ export function getConflictFreeName(
         counter++;
         candidateName = `${fallbackBase} ${counter}${extension}`;
     }
-    
+
     return candidateName;
 }
 
@@ -407,7 +407,7 @@ export async function toggleHiddenStatus(app: App, file: TFile, settings: Abstra
       // For toggling hidden, we only operate on the primary property name for consistency,
       // but we should check all configured parent properties to see if it's already hidden.
       const primaryPropertyName = settings.parentPropertyNames[0] || settings.propertyName;
-      
+
       let isCurrentlyHidden = false;
       let targetProp = primaryPropertyName;
 
@@ -431,7 +431,7 @@ export async function toggleHiddenStatus(app: App, file: TFile, settings: Abstra
 
       if (isCurrentlyHidden) {
         const newParents = parentLinks.filter((p: string) => p.toLowerCase().trim() !== 'hidden');
-        
+
         if (newParents.length > 0) {
           frontmatter[targetProp] = newParents.length === 1 ? newParents[0] : newParents;
         } else {
@@ -493,10 +493,10 @@ export async function moveFiles(
         await app.fileManager.processFrontMatter(file, (frontmatter: AbstractFolderFrontmatter) => {
             // When moving, we prioritize the first defined parent property name
             const parentPropertyName = settings.parentPropertyNames[0] || settings.propertyName;
-            
+
             // However, we should also check other properties if they exist and remove the old parent from them too.
             const allParentProps = settings.parentPropertyNames;
-            
+
             for (const propName of allParentProps) {
                 const rawParents = frontmatter[propName];
                 if (!rawParents) continue;
@@ -518,7 +518,7 @@ export async function moveFiles(
                             cleanLink = cleanLink.trim();
 
                             const linkTargetFile = app.metadataCache.getFirstLinkpathDest(cleanLink, file.path);
-                            
+
                             let isMatch = false;
                             if (linkTargetFile) {
                                  isMatch = linkTargetFile.path === sourceParentFile.path;
@@ -527,7 +527,7 @@ export async function moveFiles(
                                 const sourceBasename = (sourceParentFile instanceof TFile) ? sourceParentFile.basename : sourceParentFile.name;
                                 isMatch = cleanLink === sourceName || cleanLink === sourceBasename;
                             }
-                            
+
                             return !isMatch;
                         });
                     }
@@ -578,14 +578,14 @@ export async function moveFiles(
                 for (const childrenProp of settings.childrenPropertyNames) {
                     const rawChildren = frontmatter[childrenProp];
                     if (!rawChildren) continue;
-                    
+
                     let childrenList: string[] = [];
                     if (Array.isArray(rawChildren)) {
                         childrenList = rawChildren as string[];
                     } else if (typeof rawChildren === 'string') {
                         childrenList = [rawChildren];
                     }
-                    
+
                     childrenList = childrenList.filter(link => {
                         return !nonMdFiles.some(movedFile =>
                             link.includes(movedFile.name)
